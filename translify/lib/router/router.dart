@@ -1,0 +1,88 @@
+// Define the routes used in the app
+
+import 'package:go_router/go_router.dart';
+import 'routes.dart';
+
+// View imports
+import 'package:translify/views/Authentication_Views/login_view.dart';
+import 'package:translify/views/Authentication_Views/sign_up_view.dart';
+import 'package:translify/views/Authentication_Views/after_new_user_view.dart';
+import 'package:translify/views/Home_View/home_view.dart';
+import 'package:translify/views/Conversation_Translation_Views/conversation_translation_view.dart';
+import 'package:translify/views/Camera_Translation_Views/camera_permissions_view.dart';
+import 'package:translify/views/Camera_Translation_Views/initial_camera_view.dart';
+import 'package:translify/views/Camera_Translation_Views/after_picture_taken_view.dart';
+import 'package:translify/views/Settings_View/setting_view.dart';
+import 'package:translify/views/Authentication_Views/auth_check_view.dart';
+
+import 'package:translify/views/Camera_Translation_Views/camera_translation_result.dart';
+import "package:translify/models/image_translation_response_model.dart";
+
+final GoRouter router = GoRouter(
+  routes: [
+    GoRoute(
+      path: AppRoutes.authCheck,
+      builder: (context, state) => const AuthCheckView(),
+    ),
+    GoRoute(
+      path: AppRoutes.login,
+      builder: (context, state) => const LoginView(),
+    ),
+    GoRoute(
+      path: AppRoutes.signUp,
+      builder: (context, state) => const SignUpView(),
+    ),
+    GoRoute(
+      path: AppRoutes.afterNewUser,
+      builder: (context, state) => const AfterNewUserView(),
+    ),
+    GoRoute(
+      path: AppRoutes.home,
+      builder: (context, state) => const HomeView(),
+    ),
+    GoRoute(
+      path: AppRoutes.conversation,
+      builder: (context, state) => const ConversationTranslationView(),
+    ),
+    GoRoute(
+      path: AppRoutes.cameraPermission,
+      builder: (context, state) => const CameraPermissionsView(),
+    ),
+    GoRoute(
+      path: AppRoutes.initialCamera,
+      builder: (context, state) => const InitialCameraTranslationView(),
+    ),
+    GoRoute(
+      path: AppRoutes.afterCamera,
+      builder: (context, state) {
+        final source = state.pathParameters["sourceLang"]!;
+        final target = state.pathParameters["targetLang"]!;
+        final String path = state.extra as String;
+
+        return AfterPictureTakenView(
+          imagePath: path,
+          initialSourceLanguage: source,
+          initialTargetLanguage: target,
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.cameraTranslationResult,
+      builder: (context, state) {
+        // Get the data from the route state
+        final data = state.extra as Map<String, dynamic>;
+
+        final String path = data["path"] as String;
+        final List<ImageTranslationResponseModel> results =
+            data["results"] as List<ImageTranslationResponseModel>;
+
+        return CameraTranslationResult(imagePath: path, detectedText: results);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.settings,
+      builder: (context, state) => const SettingView(),
+    ),
+  ],
+  initialLocation: AppRoutes.authCheck,
+);
