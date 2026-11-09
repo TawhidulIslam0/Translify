@@ -15,8 +15,6 @@ Real-Time Multimodal Translation System
 - [Development Workflow](#development-workflow)
 - [Security & Privacy](#security--privacy)
 - [Performance Considerations](#performance-considerations)
-- [Roadmap](#roadmap)
-- [Team Members](#team-members)
 
 ---
 
