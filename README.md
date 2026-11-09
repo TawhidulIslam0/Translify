@@ -1,5 +1,10 @@
 # Translify
-Real-Time Multimodal Translation System  
+
+> **Real-Time Multimodal Translation System**
+
+Translify is a mobile application designed to bridge real-world communication gaps. It provides camera-based OCR text translation and real-time bidirectional speech translation in an architecture engineered for user privacy and low latency.
+
+---
 
 ## Table of Contents
 
@@ -20,154 +25,231 @@ Real-Time Multimodal Translation System
 
 ## Overview
 
-- Camera-Based Text Translation: Users can simply point their camera at text, and the app detects, reads, and overlays the translation directly on the screen. This feature will be useful for translation in everyday scenarios such as menus, signs, and documents.
-- Conversational Speech Translation: Two users will be able to communicate with each other using one phone. They will choose their languages. A user will then speak into the microphone. The app will transcribe the speech into text, translate it, and display the translation on the phone for the other person to read.
-- Base Languages: At the very minimum, we plan to include functionality for English and Spanish. However, we very much expect to be able to introduce more languages
+Translify enables seamless, multimodal translation across everyday real-world contexts:
 
-Additional features of the app include the following
+* **Camera-Based Text Translation:** Point your camera at menus, signs, or printed documents to detect, transcribe, and overlay translations directly onto the live view.
+* **Conversational Speech Translation:** Two users share a single device to converse. Spoken input is transcribed into text, translated, and displayed on screen in real time.
+* **Core Language Support:** Initial release supports English and Spanish, with an extensible framework built for scalable multi-language expansion.
+* **Privacy-First Design:** Features complete user data ownership. Users choose whether translation history is stored locally or on the server.
 
-- Privacy concerns: we will allow the user to decide whether or not they want their translations stored, and we will not use their data for any other purpose other than to display their recent translations
-- Stored translations: if allowed by the user, we will store their translations, so that they can look over them at a later time. This storing will be done in a secure manner
+---
 
 ## Problem
 
-In today’s world, there are many languages in use. According to New York State's Office of General Services, there are over 800 languages used in the City. Chances are high that you run into a situation that you do not understand because of language barriers.Consider the following situations:
+In globalized urban environments and travel destinations, language barriers present continuous friction:
 
-- Someone asks you for directions to a tourist attraction. You want to help but can’t due to not understanding their question
-- You see a sign outside of a shop advertising something. However, you can’t understand what is being advertised because it is in a different language
-- You visit a city in a different country. Despite your best attempts to learn the language beforehand, all of that knowledge flows out of your mind the moment you step foot into the city.
-- You have binding legal documents in front of you, in a different language.
+* **Daily Interactions:** Difficulty asking for directions or understanding local transport signs.
+* **Travel Friction:** Anxiety and communication blockages when arriving in foreign environments.
+* **Legal & Official Documents:** Inability to inspect or understand physical documents without intermediate translators.
 
-The solution for when you don’t know a language, is to translate between languages. In the past, this was done usually through a person who knew both your language, and the language of the content that you want to understand. However, this method of translation has some problems: relying on such a person to exist and be physically with you in the first place, possible slow translation, and privacy concerns.
+Relying on human translators can be costly, slow, and unfeasible for immediate everyday needs. Existing mobile commercial solutions (e.g., Google Translate, DeepL) often bundle cluttered interfaces, unnecessary features, and aggressive data retention policies that compromise user privacy.
 
-Nowadays, translation is done through online services and applications such as Google Translate or DeepL Translate. These services provide quick and free translation into a multitude of languages. However, these services have their problems: there could be unnecessary features within these apps that aren’t needed, unclear layouts that may further complicate translation, and additional privacy concerns, such as the storing of sensitive data.
+---
 
 ## Solution
 
-We propose Translify: a mobile app that will facilitate easy translation between languages, in the form of the following features below:
+Translify delivers a streamlined, self-hosted translation pipeline:
 
-- Camera-Based Text Translation: Users can simply point their camera at text, and the app detects, reads, and overlays the translation directly on the screen. This feature will be useful for translation in everyday scenarios such as menus, signs, and documents.
-- Conversational Speech Translation: Two users will be able to communicate with each other using one phone. They will choose their languages. A user will then speak into the microphone. The app will transcribe the speech into text, translate it, and display the translation on the phone for the other person to read.
-- Base Languages: At the very minimum, we plan to include functionality for English and Spanish. However, we very much expect to be able to introduce more languages
+* **Integrated Dual-Engine:** OCR and Speech processing accessible from a unified mobile interface.
+* **Self-Hosted Infrastructure:** Translation tasks run on self-hosted instances to eliminate third-party telemetry and data harvesting.
+* **Flexible Data Storage:** Strict user opt-in controls for storing past translations.
 
-Additional features of the app include the following:
-
-- Privacy concerns: we will allow the user to decide whether or not they want their translations stored, and we will not use their data for any other purpose other than to display their recent translations
-- Stored translations: if allowed by the user, we will store their translations, so that they can look over them at a later time. This storing will be done in a secure manner
+---
 
 ## Key Features
 
-- Dual-Mode Translation Engine  
-  Supports both camera-based OCR translation and real-time speech-to-text translation within one integrated system.
+* **Dual-Mode Translation Engine:** Unified handling of live camera frames (OCR) and microphone streams (Speech-to-Text).
+* **Low-Latency Pipeline:** Optimized microservice processing for real-time overlay and display.
+* **Modular Architecture:** Fully decoupled microservices (Server Core, Image Processing, Speech Processing, Translation Engine).
+* **Self-Hosted Translation:** Powered by LibreTranslate to maintain full execution control.
+* **Granular Security Controls:** JWT authentication, hashed credentials, and explicit opt-in history retention.
 
-- Real-Time Processing Pipeline  
-  Designed for low-latency handling of image and audio inputs to provide fast translation results.
-
-- Modular Component Architecture  
-  Separates frontend, backend, image processing, speech processing, and translation components to ensure scalability and maintainability.
-
-- Self-Hosted Translation Service  
-  Uses a self-hosted LibreTranslate server to maintain control over translation logic and privacy.
-
-- Secure Data Handling  
-  User authentication and optional translation history are securely managed, with sensitive data excluded through environment configuration.
-
-- Extensible Language Support  
-  Initially supports English and Spanish, with architecture designed to easily integrate additional languages.
+---
 
 ## System Architecture
 
+```
+                       ┌──────────────────────┐
+                       │    Flutter Client    │
+                       │   (Android / iOS)    │
+                       └──────────┬───────────┘
+                                  │ HTTP / JSON
+                                  ▼
+                       ┌──────────────────────┐
+                       │  FastAPI Server Core │
+                       └────┬────────────┬────┘
+                            │            │
+            ┌───────────────┼────────────┴───────────────┐
+            ▼               ▼                            ▼
+  ┌───────────────────┐  ┌────────────────────┐  ┌──────────────────────┐
+  │ Image Processing  │  │ Speech Processing  │  │  Translation Engine  │
+  │ (OpenCV/Pytess.)  │  │ (SpeechRec/PyAudio)│  │   (LibreTranslate)   │
+  └───────────────────┘  └────────────────────┘  └──────────────────────┘
+            │               │                            │
+            └───────────────┼────────────────────────────┘
+                            ▼
+                   ┌──────────────────┐
+                   │   PostgreSQL     │
+                   │    Database      │
+                   └──────────────────┘
+```
+
+---
+
 ## Tech Stack
 
-- **Frontend:** Flutter (Dart)
-- **Backend:** Python + FastAPI + Uvicorn
-- **Database:** PostgreSQL
-- **Image Processing:** OpenCV + Pytesseract
-- **Speech Processing:** SpeechRecognition + PyAudio
-- **Translation Engine:** Self-hosted LibreTranslate
-- **Data Format:** JSON
+| Domain | Technology |
+| :--- | :--- |
+| **Frontend** | Flutter, Dart |
+| **Backend Core** | Python, FastAPI, Uvicorn |
+| **Database** | PostgreSQL |
+| **Image Processing** | OpenCV, Pytesseract |
+| **Speech Processing** | SpeechRecognition, PyAudio |
+| **Translation Engine** | Self-hosted LibreTranslate |
+| **Containerization** | Docker |
+
+---
 
 ## Data Flow
 
+### Camera Translation (OCR)
+1. User captures or points camera at text in the Flutter mobile application.
+2. Flutter sends payload to `/server_core`.
+3. `/server_core` forwards image to the `image-processing` microservice for text detection and OCR extraction.
+4. Extracted text is sent to `translation-engine` (LibreTranslate).
+5. Translated text payload is returned to Flutter and rendered on-screen.
+
+### Conversational Speech Translation
+1. User records speech input in the app.
+2. Audio stream is sent via `/server_core` to the `speech-processing` microservice for transcription.
+3. Transcribed text is dispatched to `translation-engine`.
+4. Translated response is returned to the client interface for display.
+
+---
+
 ## Repository Structure
+
+```
+.
+├── translify/               # Flutter mobile application codebase
+├── server_core/             # FastAPI backend orchestration service
+├── image_processing/        # Microservice for OpenCV & OCR operations
+├── speech_processing/       # Microservice for SpeechRecognition logic
+├── translation_engine/      # Dockerized LibreTranslate service configuration
+└── README.md                # Project documentation
+```
+
+---
 
 ## Getting Started
 
-The way this project is setup currently is assuming that it will be deployed on Google Cloud. If you want to run this locally, you should have a computer with enough memory, ideally ~24GB of RAM to be safe.
+### Prerequisites
+* **RAM:** Minimum 16GB (24GB recommended for running all microservices locally).
+* **Tools:** Flutter SDK, Android Studio (with an emulator or physical device), Docker Desktop, Python 3.10+, PostgreSQL.
 
-Detailed instructions follow below for how to run this project locally. You should read all of them (which includes following step 1 and reading the README mentioned there) before starting:
+---
 
-1. Clone this repository
-2. Instructions for the frontend are given in the README inside the `translify` folder, under the `How to Run` section. Note that you will be required to install the Flutter SDK and Android Studio at the very least, and if you don't have a physical Android device, you will have to configure an emulated device within Android Studio.
-3. For the `image-processing`, `speech-processing`, and `translation-engine` components, each folder contains a Dockerfile. You can build Docker images for each component
-   - Each container is set up to listen to port 8080. When starting the docker container, make sure to pass the `-p` flag with unique port numbers for each like so: `-p PORT_HERE:8080`. Ideally, you should NOT use port 8000 for any of these containers, since that will be used for `server-core` later on
+### Step-by-Step Setup
 
-   - Note that on container startup for `image-processing` and `translation-engine` , they will try to download model weights from Hugging Face, which can be very time consuming. If you plan to startup these containers multiple times, you can alleviate this problem by using the following volume flag when starting up these containers:
-      - MacOS or Linux: ` -v $HOME/.cache/huggingface/hub:/root/.cache/huggingface/hub`
-      - Windows: `-v C:\Users\YourName\.cache\huggingface:/root/.cache/huggingface`
-
-4. Spin up containers for all of the above, and take note which port numbers go where
-5. Make sure that you have a valid Postgres installation. The following assumes that you can access the database through the standard port of `5432`.
-6. In `/server_core`, update the included `.env` file with the following:
-
+#### 1. Clone the Repository
 ```bash
-DATABASE_USER = "username here"
-DATABASE_PASSWORD = "password here"
-DATABASE_NAME = "database name  here"
-DATABASE_SOCKET = localhost      # This is localhost as is
-
-TRANSLATE_SERVICE = http://127.0.0.1:PORT_NUMBER_YOU_CHOOSE
-IMAGE_TO_TEXT_SERVICE = http://127.0.0.1:PORT_NUMBER_YOU_CHOOSE
-SPEECH_TO_TEXT_SERVICE = http://127.0.0.1:PORT_NUMBER_YOU_CHOOSE
-
-# The remaining variables in the file can remain the same
+git clone https://github.com/your-username/translify.git
+cd translify
 ```
 
-7. In `/server_core/app/config.py`, uncomment line 5: `load_dotenv()`
-8. In a terminal, cd into `/server_core`, and create a virtual environment: `python3 -m venv venv`
-9. Activate the virtual environment: `source venv/bin/activate`
-10.   Install the required packages: `pip install -r requirements.txt`
-11.   Startup the server, depending on if you are using an emulated device or a physical device:
-      - Emulated device: `uvicorn app.main:app --reload --port 8000`
-      - Physical device: `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 `
-         - Caution with this, since this port number is now exposed to the local network
-         - You should ideally be on a private network
+#### 2. Mobile Frontend Configuration
+Navigate to the `translify` directory and follow the setup guide inside `translify/README.md`. Ensure Flutter dependencies are resolved:
+```bash
+cd translify
+flutter pub get
+```
 
-If everything went well, then it the server should start up. On the frontend, either in the emulated device or on a physical device, you should be able to use the application. Everything might be very slow, but it should work eventually.
+#### 3. Spin Up Docker Microservices
+Build and run the auxiliary microservices (`image-processing`, `speech-processing`, `translation-engine`). 
 
-Within `/server_core` there is a README with two things: an alternative way to startup the backend without Docker, and some sample tests you can use to confirm everything is working. If you do want to follow those instructions, you should still do steps 2, 5, 6, and 7 of these instructions.
+> **Note:** To prevent re-downloading Hugging Face model weights on container restart, mount your host cache directory.
 
-If there are any questions, don't hesitate to reach out to the project contributors.
+* **Linux / macOS:**
+  ```bash
+  docker run -d -p 5001:8080 -v $HOME/.cache/huggingface/hub:/root/.cache/huggingface/hub <image-processing-img>
+  docker run -d -p 5002:8080 <speech-processing-img>
+  docker run -d -p 5003:8080 -v $HOME/.cache/huggingface/hub:/root/.cache/huggingface/hub <translation-engine-img>
+  ```
+
+* **Windows (PowerShell):**
+  ```powershell
+  docker run -d -p 5001:8080 -v C:\Users\$env:USERNAME\.cache\huggingface:/root/.cache/huggingface <image-processing-img>
+  docker run -d -p 5002:8080 <speech-processing-img>
+  docker run -d -p 5003:8080 -v C:\Users\$env:USERNAME\.cache\huggingface:/root/.cache/huggingface <translation-engine-img>
+  ```
+
+#### 4. PostgreSQL Configuration
+Ensure your local PostgreSQL service is running on default port `5432` and create a database instance for the application.
+
+#### 5. Backend Server Core Environment Setup
+Create a `.env` file in `/server_core`:
+
+```env
+DATABASE_USER=postgres
+DATABASE_PASSWORD=your_password
+DATABASE_NAME=translify_db
+DATABASE_SOCKET=localhost
+
+TRANSLATE_SERVICE=http://127.0.0.1:5003
+IMAGE_TO_TEXT_SERVICE=http://127.0.0.1:5001
+SPEECH_TO_TEXT_SERVICE=http://127.0.0.1:5002
+```
+
+Ensure `load_dotenv()` is un-commented in `/server_core/app/config.py`.
+
+#### 6. Run the Backend Core
+
+* **macOS / Linux:**
+  ```bash
+  cd server_core
+  python3 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+  ```
+
+* **Windows (PowerShell / Git Bash):**
+  ```powershell
+  cd server_core
+  python -m venv venv
+  .\venv\Scripts\activate
+  pip install -r requirements.txt
+  ```
+
+**Launch Uvicorn Server:**
+* **For Android Emulator:**
+  ```bash
+  uvicorn app.main:app --reload --port 8000
+  ```
+* **For Physical Device (Local Network):**
+  ```bash
+  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  ```
+
+---
 
 ## Development Workflow
 
+1. **Branching Strategy:** Use feature branches (`feature/ocr-optimization`, `fix/audio-latency`) stemming from `main`.
+2. **Local Testing:** Test endpoints via FastAPI built-in documentation at `http://127.0.0.1:8000/docs`.
+3. **Frontend Integration:** Update local API service URLs in Flutter configuration files to target `10.0.2.2:8000` (for Android Emulator) or your workstation's LAN IP address (for physical devices).
+
+---
+
 ## Security & Privacy
 
-Translify is designed with user privacy and data security as core principles.
+* **Strict Opt-In Data Retention:** Translation streams are processed transiently in memory and purged immediately unless the user explicitly opts into saving translation history.
+* **Credential Protection:** Passwords and access tokens are hashed using bcrypt prior to database persistence.
+* **Data Isolation:** Translation history is strictly scoped to authenticated user accounts via JWT.
 
-### Data Handling
-
-- Image and audio data are processed only for translation purposes.
-- No translation data is used for analytics, advertising, or third-party sharing.
-
-### User Authentication
-
-- User credentials are securely stored.
-- Passwords are hashed before being saved to the database.
-
-### Optional Translation History
-
-- Users may opt-in to store translation history.
-- Stored translations are accessible only to the authenticated user.
-- Users can control whether their translations are saved.
+---
 
 ## Performance Considerations
 
-To keep Translify fast and responsive, both the frontend and backend follow simple performance practices.
-
-- Process small text segments instead of large blocks to translate faster.
-- Cache previous translations so the system can reuse results instead of translating the same text again.
-- Limit input size to prevent very large requests from slowing down the application.
-- Use efficient communication between the mobile app and backend to reduce unnecessary network requests.
-- Run translation locally on the backend to avoid delays from external services.
-- These practices help ensure the app provides quick and smooth translations for camera text and speech conversations.
+* **Payload Optimization:** Small text blocks are processed incrementally to maintain low latency during vision OCR tasks.
+* **Translation Caching:** Frequently translated phrases are cached locally to prevent redundant microservice requests.
+* **Input Capping:** Image payloads and speech duration are bounded at API boundaries to avoid memory spikes on the backend core.
